@@ -1,9 +1,24 @@
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login 
+from django.views.generic.edit import FormView
+from django.contrib.auth.forms import UserCreationForm 
 from django.contrib.auth.views import LoginView
-from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.contrib import messages
+from .forms import RegisterForm
 
+
+class RegisterView(FormView):
+    template_name = 'registration/register.html'
+    form_class = RegisterForm
+    redirect_autheticated_user = True
+    success_url = reverse_lazy('tasks')
+    
+    def form_valid(self, form):
+        user = form.save()
+        if user:
+            login(self.request, user)
+        return super(RegisterView, self).form_valid(form)
+ 
 class MyLoginView(LoginView):
     redirect_authenticated_user = True
     
